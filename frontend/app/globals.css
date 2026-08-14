@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+html {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 45%, #f8fafc 100%);
+  min-height: 100vh;
+}
+
+::selection {
+  background: #c7d2fe;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma *)",
+      "Bash(PGPASSWORD=smarttask psql -h localhost -p 5432 -U smarttask -d smarttask -c \"\\\\conninfo\")",
+      "Bash(lsof -nP -iTCP:5432 -sTCP:LISTEN)",
+      "Bash(brew services *)",
+      "Bash(docker volume *)",
+      "Bash(curl -sv http://localhost:3001/tasks)",
+      "Bash(curl -s -X POST http://localhost:3001/tasks -H \"Content-Type: application/json\" -d '{\"title\":\"Task via docker-compose\"}')",
+      "Bash(curl -s http://localhost:3001/tasks)",
+      "Bash(curl -s -o /dev/null -w \"Frontend HTTP %{http_code}\\\\n\" http://localhost:3000)"
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: smarttask-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-smarttask}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smarttask}
+      POSTGRES_DB: ${POSTGRES_DB:-smarttask}
+    ports:
+      - '5432:5432'
+    volumes:
+      - smarttask-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-smarttask} -d ${POSTGRES_DB:-smarttask}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - smarttask-net
+
+  backend:
+    build:
+      context: ./backend
+    image: smarttask-backend:1.0
+    container_name: smarttask-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-smarttask}:${POSTGRES_PASSWORD:-smarttask}@db:5432/${POSTGRES_DB:-smarttask}?schema=public
+      PORT: 3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3001/tasks >/dev/null 2>&1 || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - smarttask-net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    image: smarttask-frontend:1.0
+    container_name: smarttask-frontend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - smarttask-net
+
+networks:
+  smarttask-net:
+    name: smarttask-net
+
+volumes:
+  smarttask-data:
+    name: smarttask-data
